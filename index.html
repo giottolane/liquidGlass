@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquid Glass</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+        <svg width="0" height="0" style="position: absolute;">
+            <defs>
+                <filter id="liquid-glass-filter" x="0" y="0" width="100%" height="100%">
+                    <feImage xlink:href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cfilter id='a'%3E%3CfeGaussianBlur stdDeviation='10'/%3E%3C/filter%3E%3Crect width='300' height='300' fill='gray'/%3E%3Crect x='10' y='10' width='280' height='280' rx='20' fill='white' filter='url(%23a)'/%3E%3C/svg%3E" 
+                             result="dispMap" 
+                    />
+
+                    <feDisplacementMap in="SourceGraphic"
+                                       in2="dispMap"
+                                       scale="40"
+                                       xChannelSelector="R"
+                                       yChannelSelector="G" 
+                    />
+                    <feGaussianBlur stdDeviation="2"/>
+                </filter>
+            </defs>
+        </svg>
+        
+        <section class="liquid-glass">
+        </section>
+
+
+    <script>
+        let isDragging = false;
+        let startX, startY, initialX, initialY;
+
+        const liquidGlass = document.querySelector('.liquid-glass');
+
+        function centerLiquidGlass() {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            const rect = liquidGlass.getBoundingClientRect();
+            const left = (w - rect.width) / 2;
+            const top = (h - rect.height) / 2;
+            liquidGlass.style.position = 'absolute';
+            liquidGlass.style.left = left + 'px';
+            liquidGlass.style.top = top + 'px';
+        }
+        window.addEventListener('DOMContentLoaded', centerLiquidGlass);
+        window.addEventListener('resize', centerLiquidGlass);
+
+        liquidGlass.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            const rect = liquidGlass.getBoundingClientRect();
+            initialX = rect.left;
+            initialY = rect.top;
+            liquidGlass.style.cursor = 'grabbing';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+            liquidGlass.style.left = (initialX + deltaX) + 'px';
+            liquidGlass.style.top = (initialY + deltaY) + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            liquidGlass.style.cursor = 'move';
+        });
+    </script>
+
+</body>
+</html>
