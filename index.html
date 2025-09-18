@@ -5,38 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liquid Glass</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Adaptación para móvil: el cuadrado debe ser fácilmente arrastrable y visible */
+        .liquid-glass {
+            touch-action: none; /* Evita el scroll durante el drag en móvil */
+            min-width: 120px;
+            min-height: 120px;
+        }
+        @media (max-width: 600px) {
+            .liquid-glass {
+                min-width: 80px;
+                min-height: 80px;
+            }
+        }
+    </style>
 </head>
 <body>
-
-
         <svg width="0" height="0" style="position: absolute;">
             <defs>
                 <filter id="liquid-glass-filter" x="0" y="0" width="100%" height="100%">
-                    <feImage xlink:href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cfilter id='a'%3E%3CfeGaussianBlur stdDeviation='10'/%3E%3C/filter%3E%3Crect width='300' height='300' fill='gray'/%3E%3Crect x='10' y='10' width='280' height='280' rx='20' fill='white' filter='url(%23a)'/%3E%3C/svg%3E" 
-                             result="dispMap" 
-                    />
-
-                    <feDisplacementMap in="SourceGraphic"
-                                       in2="dispMap"
-                                       scale="40"
-                                       xChannelSelector="R"
-                                       yChannelSelector="G" 
-                    />
+                    <feImage xlink:href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cfilter id='a'%3E%3CfeGaussianBlur stdDeviation='10'/%3E%3C/filter%3E%3C[...]}' result="dispMap" />
+                    <feDisplacementMap in="SourceGraphic" in2="dispMap" scale="40" xChannelSelector="R" yChannelSelector="G" />
                     <feGaussianBlur stdDeviation="2"/>
                 </filter>
             </defs>
         </svg>
-        
-        <section class="liquid-glass">
-        </section>
-
-
+        <section class="liquid-glass"></section>
     <script>
         let isDragging = false;
         let startX, startY, initialX, initialY;
-
         const liquidGlass = document.querySelector('.liquid-glass');
-
         function centerLiquidGlass() {
             const w = window.innerWidth;
             const h = window.innerHeight;
@@ -49,7 +47,7 @@
         }
         window.addEventListener('DOMContentLoaded', centerLiquidGlass);
         window.addEventListener('resize', centerLiquidGlass);
-
+        // Para ratón
         liquidGlass.addEventListener('mousedown', (e) => {
             isDragging = true;
             startX = e.clientX;
@@ -59,7 +57,6 @@
             initialY = rect.top;
             liquidGlass.style.cursor = 'grabbing';
         });
-
         document.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
             const deltaX = e.clientX - startX;
@@ -67,12 +64,35 @@
             liquidGlass.style.left = (initialX + deltaX) + 'px';
             liquidGlass.style.top = (initialY + deltaY) + 'px';
         });
-
         document.addEventListener('mouseup', () => {
             isDragging = false;
             liquidGlass.style.cursor = 'move';
         });
+        // Para móviles (eventos táctiles)
+        liquidGlass.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            const touch = e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+            const rect = liquidGlass.getBoundingClientRect();
+            initialX = rect.left;
+            initialY = rect.top;
+            liquidGlass.style.cursor = 'grabbing';
+            e.preventDefault();
+        }, {passive: false});
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - startX;
+            const deltaY = touch.clientY - startY;
+            liquidGlass.style.left = (initialX + deltaX) + 'px';
+            liquidGlass.style.top = (initialY + deltaY) + 'px';
+            e.preventDefault();
+        }, {passive: false});
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+            liquidGlass.style.cursor = 'move';
+        });
     </script>
-
 </body>
 </html>
